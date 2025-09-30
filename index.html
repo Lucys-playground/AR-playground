@@ -26,28 +26,18 @@
   </header>
 
   <main>
-    <!--
-      🧩 Kam co nahrát:
-      - Nahraj svůj GLB do /models/objekt.glb
-      - (Volitelné pro iOS Quick Look) USDZ do /models/objekt.usdz
-      - (Volitelné) náhledový poster do /img/poster.jpg
-
-      ⚠️ iOS:
-      - AR Quick Look vyžaduje odkaz na .usdz soubor (atribut ios-src)
-        → Bez toho se na iOS zobrazí 3D, ale AR se neodemkne.
-    -->
+    
 
     <model-viewer id="viewer"
-      src="models/objekt.glb"
-      ios-src="models/objekt.usdz"                 
+      src="models/box.glb"
+      ios-src="/models/objekt.usdz"                 
       ar ar-modes="webxr scene-viewer quick-look"
       ar-scale="fixed"                               
       camera-controls                                 
       environment-image="neutral"                    
-      poster="img/poster.jpg"                       
+      poster="/img/poster.jpg"                       
       exposure="1.0" shadow-intensity="1"           
       touch-action="pan-y"                           
-      crossorigin="anonymous"                        
       loading="lazy">
 
       <!-- Custom AR tlačítko (Android/iOS), model-viewer si ho přepojí sám -->
@@ -85,44 +75,10 @@
         <li><strong>USDZ pro iOS</strong>: vyexportuj v Blenderu (USD), nebo použij <code>usdzconvert</code> (Apple) → <code>.usdz</code>.</li>
       </ul>
     </details>
-    <section>
-      <h2>Lokální spuštění (proč nejde kamera ani model z file://)</h2>
-      <p><strong>Souborový protokol <code>file://</code></strong> blokuje kameru a načítání modelů kvůli CORS/bezpečnosti. Spusť to přes lokální server:</p>
-      <ol>
-        <li><strong>Rychle (bez HTTPS, pouze 3D náhled):</strong><br>
-          macOS/Linux/Windows (s Pythonem):<br>
-          <code>python3 -m http.server 8080</code> → otevři <a href="http://localhost:8080">http://localhost:8080</a>
-        </li>
-        <li><strong>AR/WebXR vyžaduje HTTPS:</strong><br>
-          Node: <code>npm i -g http-server</code><br>
-          Vytvoř certifikát (např. <a href="https://github.com/FiloSottile/mkcert">mkcert</a>), pak:<br>
-          <code>http-server -p 8080 --ssl --cert cert.pem --key key.pem</code><br>
-          a otevři <a href="https://localhost:8080">https://localhost:8080</a>
-        </li>
-      </ol>
-
-      <h3>Test s malým modelem (bez nutnosti mít vlastní GLB)</h3>
-      <p>Klikni níže a přepne se demo model (Astronaut, ~2&nbsp;MB) z CDN:</p>
-      <div class="row">
-        <button id="btn-demo" class="btn btn-secondary">Načíst demo model</button>
-        <code>https://modelviewer.dev/shared-assets/models/Astronaut.glb</code>
-      </div>
-
-      <h3>Pokud máš 51&nbsp;MB model</h3>
-      <ul>
-        <li><strong>Komprese geometrií (Draco):</strong> nástroj <code>gltfpack</code> –
-          <code>gltfpack -i input.glb -o output.glb -cc -tc -kn -km -si 1</code>
-        </li>
-        <li><strong>Komprese textur (KTX2/Basis):</strong> <code>gltf-transform etc1s input.glb output.glb --slots "*"</code> a pak <code>gltf-transform optimize output.glb output_opt.glb</code>
-        </li>
-        <li><strong>V Blenderu:</strong> Export glTF 2.0 → zapnout <em>Draco</em> (Level ~7), textury zmenšit (512–2048px), spojit meshe, odstranit zbytečné UV/vertex colors.
-        </li>
-      </ul>
-    </section>
   </main>
 
   <footer>
-    © Demo – připraveno pro rychlý start. Nahraď cesty k souborům svými. | <span id="diag"></span>
+    © Demo – připraveno pro rychlý start. Nahraď cesty k souborům svými.
   </footer>
 
   <script>
@@ -135,46 +91,6 @@
       l.rel = 'preload'; l.as = 'fetch'; l.href = 'models/objekt.glb'; l.crossOrigin = 'anonymous';
       document.head.appendChild(l);
     }
-      </script>
-    <script>
-      // Demo přepínač na lehký CDN model (astronaut)
-      document.getElementById('btn-demo')?.addEventListener('click', () => {
-        viewer.src = 'https://modelviewer.dev/shared-assets/models/Astronaut.glb';
-        viewer.iosSrc = '';
-      });
-        </script>
-    <script>
-      // Demo přepínač na lehký CDN model (astronaut)
-      document.getElementById('btn-demo')?.addEventListener('click', () => {
-        viewer.src = 'https://modelviewer.dev/shared-assets/models/Astronaut.glb';
-        viewer.iosSrc = '';
-      });
-
-      // --- RYCHLÁ DIAGNOSTIKA pro GitHub Pages ---
-      (async function(){
-        const out = [];
-        out.push(`URL: ${location.href}`);
-        out.push(`Secure context (HTTPS): ${window.isSecureContext}`);
-        out.push(`Top-level (ne v iframu): ${window.top === window.self}`);
-        out.push(`Camera API: ${!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)}`);
-
-        // Zkusíme stáhnout GLB z relativní cesty
-        try {
-          const r = await fetch('models/objekt.glb', {method: 'HEAD'});
-          out.push(`GLB HEAD status: ${r.status}`);
-          out.push(`GLB CORS: ${r.headers.get('access-control-allow-origin') || '(same-origin OK)'}`);
-        } catch (e) {
-          out.push('GLB fetch error: ' + e.message);
-        }
-
-        // Varování pro GitHub Pages s kořenovou lomítkovou cestou
-        if (location.pathname.includes('/') && location.pathname.split('/').filter(Boolean).length >= 2) {
-          out.push('Tip: U projektových stránek GitHub Pages je cesta /uživatel/repo/. Používej relativní cesty (bez počátečního /).');
-        }
-
-        document.getElementById('diag').textContent = out.join(' | ');
-      })();
-    </script>
+  </script>
 </body>
 </html>
-
