@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebAR – ukázka s &lt;model-viewer&gt;</title>
+  <!-- 1) Knihovna model-viewer -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    :root { color-scheme: light dark; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    header { padding: 16px 20px; border-bottom: 1px solid #e5e5e5; }
+    main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    model-viewer { width: 100%; height: 70vh; background: #f6f6f6; border-radius: 14px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .btn { appearance: none; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    .btn-primary { background: #111; color: white; }
+    .btn-secondary { background: #eee; }
+    .note { font-size: 14px; opacity: .8; }
+    footer { padding: 24px; opacity: .8; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>WebAR – &lt;model-viewer&gt;</strong>
+  </header>
+
+  <main>
+    <!--
+      🧩 Kam co nahrát:
+      - Nahraj svůj GLB do /models/objekt.glb
+      - (Volitelné pro iOS Quick Look) USDZ do /models/objekt.usdz
+      - (Volitelné) náhledový poster do /img/poster.jpg
+
+      ⚠️ iOS:
+      - AR Quick Look vyžaduje odkaz na .usdz soubor (atribut ios-src)
+        → Bez toho se na iOS zobrazí 3D, ale AR se neodemkne.
+    -->
+
+    <model-viewer id="viewer"
+      src="/models/box.glb"
+      ios-src="/models/objekt.usdz"                 
+      ar ar-modes="webxr scene-viewer quick-look"
+      ar-scale="fixed"                               
+      camera-controls                                 
+      environment-image="neutral"                    
+      poster="/img/poster.jpg"                       
+      exposure="1.0" shadow-intensity="1"           
+      touch-action="pan-y"                           
+      loading="lazy">
+
+      <!-- Custom AR tlačítko (Android/iOS), model-viewer si ho přepojí sám -->
+      <button slot="ar-button" class="btn btn-primary">Zobrazit v AR</button>
+
+      <!-- Stav načítání -->
+      <div slot="poster" style="display:flex;align-items:center;justify-content:center;height:100%;">
+        Načítám model…
+      </div>
+    </model-viewer>
+
+    <div class="row">
+      <button class="btn btn-secondary" id="btn-reset">Reset kamera</button>
+      <span class="note">Tip: klepni a táhni pro otáčení, kolečko/gesto pro zoom.</span>
+    </div>
+
+    <h2>Jak to nasadit</h2>
+    <ol>
+      <li>Struktura složek: <code>/index.html</code>, <code>/models/objekt.glb</code>, (volitelně) <code>/models/objekt.usdz</code>, <code>/img/poster.jpg</code>.</li>
+      <li>Otevři stránku přes HTTPS (nutné pro kameru v AR režimu).</li>
+      <li>Android: AR běží přes Scene Viewer (automaticky). iOS: pro AR Quick Look přidej <code>ios-src</code> s cestou na .usdz.</li>
+    </ol>
+
+    <h3>Optimalizace GLB (doporučení)</h3>
+    <ul>
+      <li>Cíl velikosti: 3–8&nbsp;MB (mobil). Použij Draco kompresi geometrií.</li>
+      <li>Textury zkomprimuj do KTX2 (BasisU); běžné velikosti 512–2048&nbsp;px.</li>
+      <li>Pivot modelu smysluplně na (0,0,0); jednotky v metrech; PBR materiály (BaseColor/Roughness/Metallic/Normal).</li>
+    </ul>
+
+    <details>
+      <summary>Rychlé tipy k exportu / konverzi</summary>
+      <ul>
+        <li><strong>Blender → glTF 2.0 (.glb)</strong>: zapni <em>+Draco</em> (Compression Level ~ 6–7), <em>+KTX2</em> pro textury.</li>
+        <li><strong>USDZ pro iOS</strong>: vyexportuj v Blenderu (USD), nebo použij <code>usdzconvert</code> (Apple) → <code>.usdz</code>.</li>
+      </ul>
+    </details>
+  </main>
+
+  <footer>
+    © Demo – připraveno pro rychlý start. Nahraď cesty k souborům svými.
+  </footer>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+    document.getElementById('btn-reset').addEventListener('click', () => viewer.resetTurntableRotation());
+
+    // Volitelně: přednačtení modelu (pokud víš cestu)
+    if ('preload' in HTMLLinkElement.prototype) {
+      const l = document.createElement('link');
+      l.rel = 'preload'; l.as = 'fetch'; l.href = '/models/objekt.glb'; l.crossOrigin = 'anonymous';
+      document.head.appendChild(l);
+    }
+  </script>
+</body>
+</html>
