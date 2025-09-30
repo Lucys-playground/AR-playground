@@ -66,7 +66,7 @@
 
     <h2>Jak to nasadit</h2>
     <ol>
-      <li>Struktura složek: <code>/index.html</code>, <code>/models/objekt.glb</code>, (volitelně) <code>/models/objekt.usdz</code>, <code>/img/poster.jpg</code>.</li>
+      <li>Struktura složek: <code>/index.html</code>, <code>models/objekt.glb</code>, (volitelně) <code>models/objekt.usdz</code>, <code>/img/poster.jpg</code>.</li>
       <li>Otevři stránku přes HTTPS (nutné pro kameru v AR režimu).</li>
       <li>Android: AR běží přes Scene Viewer (automaticky). iOS: pro AR Quick Look přidej <code>ios-src</code> s cestou na .usdz.</li>
     </ol>
@@ -132,7 +132,7 @@
     // Volitelně: přednačtení modelu (pokud víš cestu)
     if ('preload' in HTMLLinkElement.prototype) {
       const l = document.createElement('link');
-      l.rel = 'preload'; l.as = 'fetch'; l.href = '/models/objekt.glb'; l.crossOrigin = 'anonymous';
+      l.rel = 'preload'; l.as = 'fetch'; l.href = 'models/objekt.glb'; l.crossOrigin = 'anonymous';
       document.head.appendChild(l);
     }
       </script>
@@ -177,3 +177,4 @@
     </script>
 </body>
 </html>
+
